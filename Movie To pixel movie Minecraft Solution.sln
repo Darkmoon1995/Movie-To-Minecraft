@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35208.52
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movie To pixel movie Minecraft", "Movie To pixel movie Minecraft\Movie To pixel movie Minecraft.csproj", "{43401EBF-7C3C-40A4-BF49-B4FA4DC7C109}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43401EBF-7C3C-40A4-BF49-B4FA4DC7C109}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43401EBF-7C3C-40A4-BF49-B4FA4DC7C109}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43401EBF-7C3C-40A4-BF49-B4FA4DC7C109}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43401EBF-7C3C-40A4-BF49-B4FA4DC7C109}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D38170AF-D354-4C40-90A0-86422320C3DB}
+	EndGlobalSection
+EndGlobal

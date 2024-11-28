@@ -1,0 +1,40 @@
+﻿<Window x:Class="Movie_To_pixel_movie_Minecraft.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Minecraft Block Converter" Height="600" Width="1000">
+    <Grid>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
+            <Button Content="Load Video" Click="LoadVideo_Click" Width="120" Margin="5"/>
+
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="X Blocks:" VerticalAlignment="Center"/>
+                <TextBox x:Name="XBlocksTextBox" Width="40" Text="50" Margin="5"/>
+                <TextBlock Text="Z Blocks:" VerticalAlignment="Center"/>
+                <TextBox x:Name="ZBlocksTextBox" Width="40" Text="50" Margin="5"/>
+                <Button Content="Apply Dimensions" Click="ApplyDimensions_Click" Width="120"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Button Content="Zoom In" Click="ZoomIn_Click" Width="60" Margin="5"/>
+                <Button Content="Zoom Out" Click="ZoomOut_Click" Width="60"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="Base Coordinates:" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                <TextBox x:Name="BaseCoordinateX" Width="40" Text="~0" Margin="5"/>
+                <TextBox x:Name="BaseCoordinateY" Width="40" Text="~0" Margin="5"/>
+                <TextBox x:Name="BaseCoordinateZ" Width="40" Text="~0" Margin="5"/>
+            </StackPanel>
+
+            <Button Content="Generate Minecraft Commands" Click="GenerateCommands_Click" Width="180" Margin="5"/>
+        </StackPanel>
+
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="10,191,10,10">
+            <Canvas x:Name="CanvasOutput" Width="800" Height="800" RenderTransformOrigin="0.5,0.5">
+                <Canvas.RenderTransform>
+                    <ScaleTransform x:Name="ZoomTransform" ScaleX="1" ScaleY="1"/>
+                </Canvas.RenderTransform>
+            </Canvas>
+        </ScrollViewer>
+    </Grid>
+</Window>
