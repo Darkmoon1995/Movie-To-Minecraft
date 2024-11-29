@@ -23,11 +23,11 @@ Convert videos into pixel-art movies within Minecraft using pure commands, witho
 2. Select output directory
 3. Choose video file
 4. Process video
-5. Import generated `.mcfunction` files in datapack one by one and run them. (/function {NameOfdatapack}segment{i}) 
+5. Import generated `.mcfunction` files in datapack one by one and run them. `/function {NameOfdatapack}segment {Number}` 
 Note: Loading All of them together will make your minecraft crash
-6. Setup armorstand with Tag VideoPlayerArmorStand (/Tag add @e[type=armorstand] VideoPlayerArmorStand)
-7. Put command block to add 1 to "Timer" scorreboard in minecraft (scoreboard players add @e Timer 1)
-8. Add All the videoplayer_segment{i} To the datapack you used and then run multiple chain command blocks in to eachother that uses the functions 
+6. Setup armorstand with Tag VideoPlayerArmorStand `/Tag add @e[type=armorstand] VideoPlayerArmorStand`
+7. Put command block to add 1 to "Timer" scorreboard in minecraft `/scoreboard players add @e Timer 1`
+8. Add All the `videoplayer_segment {Number}` To the datapack you used and then run multiple chain command blocks in to eachother That uses that commands.
 
 ## Customization
 ### Adjust Video Resolution
