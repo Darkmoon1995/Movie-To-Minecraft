@@ -48,3 +48,4 @@ int framesPerSegment = (int)(frameRate * 5); // Change 5 to desired duration
 - Block color matching is approximate
 - Requires manual Minecraft command import
 - If the blocks go out of range of /clone it will not work
+- Also more than 20 frames will not work perfectly(20 frame is the max with command blocks in minecraft )
