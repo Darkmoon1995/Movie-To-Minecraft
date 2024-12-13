@@ -430,34 +430,39 @@ namespace Movie_To_pixel_movie_Minecraft
                 int targetWidth = xBlocks;
                 int targetHeight = zBlocks;
                 var resizedBitmap = new TransformedBitmap(bitmap, new ScaleTransform((double)targetWidth / frameWidth, (double)targetHeight / frameHeight));
+                
+                    // Calculate resized stride and create buffer for resized bitmap
+                    int resizedStride = (resizedBitmap.PixelWidth * pixelFormat.BitsPerPixel + 7) / 8;
+                    byte[] resizedPixels = new byte[resizedStride * resizedBitmap.PixelHeight];
+                    try
+                    {
+                        resizedBitmap.CopyPixels(resizedPixels, resizedStride, 0);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        MessageBox.Show($"Error copying pixels from resized bitmap: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    // Apply Floyd-Steinberg dithering to the resized pixels
+                    ApplyFloydSteinbergDithering(resizedPixels, resizedBitmap.PixelWidth/4*3, resizedBitmap.PixelHeight, resizedStride);
 
-                // Calculate resized stride and create buffer for resized bitmap
-                int resizedStride = (resizedBitmap.PixelWidth * pixelFormat.BitsPerPixel + 7) / 8;
-                byte[] resizedPixels = new byte[resizedStride * resizedBitmap.PixelHeight];
-                try
-                {
-                    resizedBitmap.CopyPixels(resizedPixels, resizedStride, 0);
-                }
-                catch (ArgumentException ex)
-                {
-                    MessageBox.Show($"Error copying pixels from resized bitmap: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
+                    // Process the pixels to display as blocks
+                    blockColors = new Color[xBlocks, zBlocks];
+                    DisplayBlocks(resizedPixels, resizedBitmap.PixelWidth, resizedBitmap.PixelHeight, resizedStride, x);
+                    GenerateMinecraftCommands(yCoordinate, x);
 
-                // Process the pixels to display as blocks
-                blockColors = new Color[xBlocks, zBlocks];
-                DisplayBlocks(resizedPixels, resizedBitmap.PixelWidth, resizedBitmap.PixelHeight, resizedStride, x);
-                GenerateMinecraftCommands(yCoordinate, x); // Generate commands for this frame
-
+                 
             }
             catch (ArgumentException argEx)
             {
                 MessageBox.Show($"ArgumentException encountered: {argEx.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
         }
 
 
@@ -561,6 +566,84 @@ namespace Movie_To_pixel_movie_Minecraft
                 }
             }
 
+        }
+        private void ApplyFloydSteinbergDithering(byte[] pixels, int width, int height, int stride)
+        {
+            // Create a copy of the pixel data to apply dithering
+            byte[] ditheredPixels = (byte[])pixels.Clone();
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int index = y * stride + x * 4;
+
+                    // Ensure index is within bounds
+                    if (index + 2 >= ditheredPixels.Length)
+                        continue;
+
+                    // Extract current pixel's color values (BGR)
+                    byte oldB = ditheredPixels[index];
+                    byte oldG = ditheredPixels[index + 1];
+                    byte oldR = ditheredPixels[index + 2];
+
+                    // Find the nearest color in the Minecraft palette
+                    Color oldColor = Color.FromRgb(oldR, oldG, oldB);
+                    var nearestBlock = GetNearestBlockColor(oldColor);
+                    Color newColor = nearestBlock.Key;
+
+                    // Update the pixel to the nearest block's color
+                    ditheredPixels[index] = newColor.B;
+                    ditheredPixels[index + 1] = newColor.G;
+                    ditheredPixels[index + 2] = newColor.R;
+
+                    // Calculate quantization error
+                    int errorR = oldR - newColor.R;
+                    int errorG = oldG - newColor.G;
+                    int errorB = oldB - newColor.B;
+
+                    // Distribute the error to neighboring pixels
+                    if (x + 1 < width) // Right neighbor
+                    {
+                        int rightIndex = y * stride + (x + 1) * 4;
+                        ditheredPixels[rightIndex] = (byte)Clamp(ditheredPixels[rightIndex] + errorB * 7 / 16);
+                        ditheredPixels[rightIndex + 1] = (byte)Clamp(ditheredPixels[rightIndex + 1] + errorG * 7 / 16);
+                        ditheredPixels[rightIndex + 2] = (byte)Clamp(ditheredPixels[rightIndex + 2] + errorR * 7 / 16);
+                    }
+
+                    if (y + 1 < height) // Bottom neighbor
+                    {
+                        int bottomIndex = (y + 1) * stride + x * 4;
+                        ditheredPixels[bottomIndex] = (byte)Clamp(ditheredPixels[bottomIndex] + errorB * 5 / 16);
+                        ditheredPixels[bottomIndex + 1] = (byte)Clamp(ditheredPixels[bottomIndex + 1] + errorG * 5 / 16);
+                        ditheredPixels[bottomIndex + 2] = (byte)Clamp(ditheredPixels[bottomIndex + 2] + errorR * 5 / 16);
+                    }
+
+                    if (x - 1 >= 0 && y + 1 < height) // Bottom-left neighbor
+                    {
+                        int bottomLeftIndex = (y + 1) * stride + (x - 1) * 4;
+                        ditheredPixels[bottomLeftIndex] = (byte)Clamp(ditheredPixels[bottomLeftIndex] + errorB * 3 / 16);
+                        ditheredPixels[bottomLeftIndex + 1] = (byte)Clamp(ditheredPixels[bottomLeftIndex + 1] + errorG * 3 / 16);
+                        ditheredPixels[bottomLeftIndex + 2] = (byte)Clamp(ditheredPixels[bottomLeftIndex + 2] + errorR * 3 / 16);
+                    }
+
+                    if (x + 1 < width && y + 1 < height) // Bottom-right neighbor
+                    {
+                        int bottomRightIndex = (y + 1) * stride + (x + 1) * 4;
+                        ditheredPixels[bottomRightIndex] = (byte)Clamp(ditheredPixels[bottomRightIndex] + errorB * 1 / 16);
+                        ditheredPixels[bottomRightIndex + 1] = (byte)Clamp(ditheredPixels[bottomRightIndex + 1] + errorG * 1 / 16);
+                        ditheredPixels[bottomRightIndex + 2] = (byte)Clamp(ditheredPixels[bottomRightIndex + 2] + errorR * 1 / 16);
+                    }
+                }
+            }
+
+            // Update the original pixel array with dithered values
+            Array.Copy(ditheredPixels, pixels, ditheredPixels.Length);
+        }
+
+        private int Clamp(int value, int min = 0, int max = 255)
+        {
+            return Math.Max(min, Math.Min(max, value));
         }
 
 
